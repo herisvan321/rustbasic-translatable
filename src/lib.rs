@@ -1,7 +1,7 @@
 pub mod translator;
 pub mod middleware;
 
-// Re-export the Axum middleware for easy integration in parent routers
+// Re-export the RustBasic middleware for easy integration in parent routers
 pub use middleware::translatable_middleware;
 
 /// Translate a key using the active request-scoped locale automatically

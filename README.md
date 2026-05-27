@@ -11,9 +11,9 @@ Dengan memanfaatkan kemampuan canggih `tokio::task_local!`, paket ini mampu meng
 - 📂 **Zero-Config Scaffolding**: Secara otomatis membuat folder `lang/` di root proyek induk Anda lengkap dengan template bahasa bawaan (`id.json` dan `en.json`) saat proyek dikompilasi pertama kali.
 - ⚡ **Pencarian Kilat $O(1)$**: Mengurai file JSON bersarang (*nested JSON*) secara rekursif pada startup dan meratakannya (*flattening*) ke memori dalam bentuk *dot-separated keys* (contoh: `auth.failed`) agar lookup saat runtime berjalan super cepat.
 - 🧵 **Request-Scoped Locale**: Mengikat preferensi bahasa aktif ke *connection task* menggunakan `tokio::task_local!`, memungkinkan pemanggilan fungsi `trans` atau `__` secara global.
-- 🎯 **Deteksi Bahasa Pintar (Axum Middleware)**: Mendeteksi preferensi bahasa pengguna secara otomatis berdasarkan prioritas berikut:
+- 🎯 **Deteksi Bahasa Pintar (RustBasic Middleware)**: Mendeteksi preferensi bahasa pengguna secara otomatis berdasarkan prioritas berikut:
   1. **Query Parameter**: `?lang=en` atau `?locale=en`
-  2. **Session Rust**: Membaca kunci `"locale"` di session store Axum Anda.
+  2. **Session Rust**: Membaca kunci `"locale"` di session store aplikasi Anda.
   3. **Request Cookie**: Cookie `lang` atau `locale`.
   4. **Header Browser**: Menganalisis header `Accept-Language` browser pengguna secara otomatis.
 - 🔄 **Placeholder Dinamis**: Mengganti placeholder variabel seperti `{name}` dengan nilai dinamis saat runtime secara instan.
@@ -80,7 +80,7 @@ async fn main() {
     // 2. Tentukan fallback bahasa default secara global
     rustbasic_translatable::set_default_locale("id");
 
-    // Setup server Axum seperti biasa...
+    // Setup server RustBasic seperti biasa...
 }
 ```
 
@@ -89,16 +89,15 @@ async fn main() {
 Tambahkan `translatable_middleware` ke router aplikasi Anda. Middleware ini secara otomatis mengekstrak preferensi bahasa pengguna di setiap request dan mengikatnya ke konteks asinkron aktif:
 
 ```rust
-use rustbasic_core::axum::{Router, routing::get};
-use rustbasic_core::server::AppState;
+use rustbasic_core::{Router, get, from_fn};
 use crate::app::http::controllers::welcome_controller;
 
-pub fn router() -> Router<AppState> {
+pub fn router() -> Router {
     Router::new()
         .route("/", get(welcome_controller::index))
         .route("/about", get(welcome_controller::about))
         // Daftarkan middleware di sini agar aktif di seluruh rute
-        .layer(axum::middleware::from_fn(rustbasic_translatable::translatable_middleware))
+        .layer(from_fn(rustbasic_translatable::translatable_middleware))
 }
 ```
 
@@ -109,11 +108,10 @@ pub fn router() -> Router<AppState> {
 Setelah middleware dipasang, Anda dapat langsung menggunakan makro/fungsi global `__` atau `trans` di mana saja tanpa perlu membawa-bawa argumen locale!
 
 ```rust
-use rustbasic_core::responses::ResponseHelper;
+use rustbasic_core::{Response, ResponseHelper};
 use rustbasic_translatable::{__, trans_with};
-use axum::response::IntoResponse;
 
-pub async fn index() -> impl IntoResponse {
+pub async fn index() -> Response {
     // 1. Memanggil terjemahan datar (flat key)
     let welcome_msg = __("welcome"); 
     // ID => "Selamat datang di aplikasi kami!"
@@ -132,8 +130,8 @@ pub async fn index() -> impl IntoResponse {
     let throttle_msg = trans_with("auth.throttle", &[("seconds", "60")]);
     // ID => "Terlalu banyak percobaan masuk. Silakan coba lagi dalam 60 detik."
 
-    // Kirimkan respon sebagai JSON atau Inertia View
-    axum::Json(serde_json::json!({
+    // Kirimkan respon sebagai JSON
+    ResponseHelper::json(serde_json::json!({
         "status": "success",
         "message": greet_user,
         "error_hint": auth_error,
