@@ -4,7 +4,7 @@ use rustbasic_core::router::Response;
 use crate::translator::TRANSLATOR;
 
 // Define task-local active request locale storage
-tokio::task_local! {
+rustbasic_core::tokio::task_local! {
     pub static CURRENT_LOCALE: String;
 }
 

@@ -27,8 +27,6 @@ fn main() {
         return;
     }
 
-    println!("cargo:warning=🌐 rustbasic-translatable: Menyiapkan scaffolding folder bahasa (lang)...");
-
     // 1. Create lang directory
     let lang_dir = project_root.join("lang");
     fs::create_dir_all(&lang_dir).ok();

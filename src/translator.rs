@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::sync::RwLock;
 use std::fs;
 use std::path::Path;
-use once_cell::sync::Lazy;
+use std::sync::LazyLock;
+use rustbasic_core::serde_json;
 
 /// Core Translator struct containing thread-safe mappings of locales to flat key-value pairs
 pub struct Translator {
@@ -11,7 +12,7 @@ pub struct Translator {
 }
 
 /// Global, thread-safe instance of the Translator
-pub static TRANSLATOR: Lazy<Translator> = Lazy::new(|| Translator {
+pub static TRANSLATOR: LazyLock<Translator> = LazyLock::new(|| Translator {
     translations: RwLock::new(HashMap::new()),
     default_locale: RwLock::new("id".to_string()),
 });
