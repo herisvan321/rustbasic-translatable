@@ -27,8 +27,8 @@ Cukup tambahkan `rustbasic-translatable` ke dalam blok dependensi `Cargo.toml` p
 
 ```toml
 [dependencies]
-rustbasic-core = { path = "../rustbasic-core", version = "0.1" }
-rustbasic-translatable = { path = "../rustbasic-translatable", version = "0.0" }
+rustbasic-core = { version = "0.0" }
+rustbasic-translatable = { version = "0.0" }
 ```
 
 Saat Anda menjalankan perintah `cargo build` atau `cargo check` berikutnya, paket ini akan langsung memicu pembuatan otomatis folder bahasa Anda!

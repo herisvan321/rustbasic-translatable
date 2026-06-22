@@ -1,6 +1,6 @@
 [package]
 name = "rustbasic-translatable"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2024"
 build = "build.rs"
 description = "Multi-language JSON translation and localization package for the RustBasic Framework."
@@ -17,4 +17,4 @@ name = "rustbasic_translatable"
 path = "src/lib.rs"
 
 [dependencies]
-rustbasic-core = "0.1"
+rustbasic-core = "0.0"
